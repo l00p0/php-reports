@@ -4,20 +4,20 @@
 	{% for chart in Charts %}
 	<div id='chart_div_{{chart.num}}' style='{% if chart.width %}width:{{chart.width}};{% endif %}{% if chart.height %}height:{{chart.height}};{% endif %}'></div>
 	{% endfor %}
-	
+
 	<script type="text/javascript">
 	function drawCharts() {
 		{% for chart in Charts %}
 			var data_{{chart.num}} = new google.visualization.DataTable();
-					
+
 			{% for key,value in chart.Rows[0].values %}
-                {% if chart.roles[key] %} 
+                {% if chart.roles[key] %}
                     data_{{chart.num}}.addColumn({{chart.roles[key]|json_encode|raw}});
                 {% else %}
                     data_{{chart.num}}.addColumn("{{chart.datatypes[key]}}","{{chart.Rows[0].values[key].key}}");
                 {% endif %}
 			{% endfor %}
-		
+
 			var rows = [
 				{% for row in chart.Rows %}[
 					{% for value in row.values %}
@@ -34,12 +34,12 @@
 						{%- endif %}
 						{%- if not loop.last %},{% endif -%}
 					{% endfor %}
-					
+
 				]{% if not loop.last %},{% endif %}
 
 				{% endfor %}];
 
-		
+
 			data_{{chart.num}}.addRows(rows);
 
             // create columns array
@@ -70,7 +70,7 @@
             options_{{ chart.num}}["{{ k }}"] = {{ v|json_encode|raw }};
         {% endfor %}
         {% endif %}
-			
+
 			{% for color in chart.colors %}
 				options_{{chart.num}}.colors.push('{{color}}');
 			{% endfor %}
@@ -97,7 +97,14 @@
         {% else %}
           var chart_{{chart.num}} = new google.visualization.{{chart.type}}(document.getElementById('chart_div_{{chart.num}}'));
         {% endif %}
-
+				{% if chart.options['as_png'] %}
+				  // console.debug('rendering chart {{chart.num}} as png');
+					// Wait for the chart to finish drawing before calling the getImageURI() method.
+					google.visualization.events.addListener(chart_{{chart.num}}, 'ready', function () {
+						chart_div_{{chart.num}}.innerHTML = '<img src="' + chart_{{chart.num}}.getImageURI() + '">';
+						console.log(chart_div_{{chart.num}}.innerHTML);
+					});
+				{% endif %}
         chart_{{chart.num}}.draw(data_{{chart.num}}, options_{{chart.num}});
 		{% endfor %}
 	}
