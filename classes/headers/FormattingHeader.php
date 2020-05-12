@@ -31,22 +31,26 @@ class FormattingHeader extends HeaderBase {
 		'selectable'=>array(
 			'type'=>'string'
 		),
+		'emailable'=>array(
+			'type'=>'boolean',
+			'default'=>false
+		),
 		'dataset'=>array(
 			'required'=>true,
 			'default'=>true
 		)
 	);
-	
+
 	public static function init($params, &$report) {
 		if(!isset($report->options['Formatting'])) $report->options['Formatting'] = array();
 		$report->options['Formatting'][] = $params;
 	}
-	
+
 	public static function parseShortcut($value) {
 		$options = explode(',',$value);
-		
+
 		$params = array();
-		
+
 		foreach($options as $v) {
 			if(strpos($v,'=')!==false) {
 				list($k,$v) = explode('=',$v,2);
@@ -56,15 +60,15 @@ class FormattingHeader extends HeaderBase {
 				$k = $v;
 				$v=true;
 			}
-			
+
 			$k = trim($k);
-			
+
 			$params[$k] = $v;
 		}
-		
+
 		return $params;
 	}
-	
+
 	public static function beforeRender(&$report) {
 		$formatting = array();
 		// Expand out by dataset
@@ -103,9 +107,9 @@ class FormattingHeader extends HeaderBase {
 				}
 			}
 		}
-		
+
 		$report->options['Formatting'] = $formatting;
-		
+
 		// Apply formatting options for each dataset
 		foreach($formatting as $i=>$params) {
 			if(isset($params['limit']) && $params['limit']) {
@@ -113,16 +117,16 @@ class FormattingHeader extends HeaderBase {
 			}
 			if(isset($params['selectable']) && $params['selectable']) {
 				$selected = array();
-				
+
 				// New style "selected_{{DATASET}}" querystring
 				if(isset($_GET['selected_'.$i])) {
 					$selected = $_GET['selected_'.$i];
 				}
 				// Old style "selected" querystring
-				elseif(isset($_GET['selected'])) {	
+				elseif(isset($_GET['selected'])) {
 					$selected = $_GET['selected'];
 				}
-				
+
 				if($selected) {
 					$selected_key = null;
 					foreach($report->options['DataSets'][$i]['rows'][0]['values'] as $key=>$value) {
@@ -131,10 +135,10 @@ class FormattingHeader extends HeaderBase {
 							break;
 						}
 					}
-			
+
 					if($selected_key !== null) {
 						foreach($report->options['DataSets'][$i]['rows'] as $key=>$row) {
-							
+
 							if(!in_array($row['values'][$selected_key]->getValue(),$selected)) {
 								unset($report->options['DataSets'][$i]['rows'][$key]);
 							}
@@ -151,7 +155,7 @@ class FormattingHeader extends HeaderBase {
 							$header = new ReportValue(1, 'key', $value->key);
 							$header->class = 'left lpad';
 							$header->is_header = true;
-							
+
 							$rows[$value->key] = array(
 								'values'=>array(
 									$header
@@ -159,16 +163,16 @@ class FormattingHeader extends HeaderBase {
 								'first'=>!$rows
 							);
 						}
-						
+
 						$rows[$value->key]['values'][] = $value;
 					}
 				}
-				
+
 				$rows = array_values($rows);
-				
+
 				$report->options['DataSets'][$i]['vertical'] = $rows;
 			}
-			
+
 			unset($params['vertical']);
 			foreach($params as $k=>$v) {
 				$report->options['DataSets'][$i][$k] = $v;
