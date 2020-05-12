@@ -2,20 +2,54 @@
 
 {% block content %}
 	{% for chart in Charts %}
+	<!--
+	  <img id='chart_img_{{chart.num}}' style='{% if chart.width %}width:{{chart.width}};{% endif %}{% if chart.height %}height:{{chart.height}};{% endif %}'>
+  -->
 	<div id='chart_div_{{chart.num}}' style='{% if chart.width %}width:{{chart.width}};{% endif %}{% if chart.height %}height:{{chart.height}};{% endif %}'></div>
 	{% endfor %}
 
 	<script type="text/javascript">
+	/*Function.prototype.bind = Function.prototype.bind || function (thisp) {
+    var fn = this;
+    return function () {
+        return fn.apply(thisp, arguments);
+    };
+	};*/
+	//console.debug('global scope javascript is running');
+/*  function chartToImg(chartnum){
+		var mySVG    = document.querySelector('#chart_div_'+chartnum+' svg'),      // Inline SVG element
+	 			tgtImage = document.querySelector('#chart_img_'+chartnum),      // Where to draw the result
+		 		can      = document.createElement('canvas'), // Not shown on page
+		 		ctx      = can.getContext('2d'),
+		 		loader   = new Image;                        // Not shown on page
+
+		loader.width  = can.width  = tgtImage.width;
+		loader.height = can.height = tgtImage.height;
+		loader.onload = function(){
+			ctx.drawImage( loader, 0, 0, loader.width, loader.height );
+			tgtImage.src = can.toDataURL();
+		};
+
+		var svgAsXML = (new XMLSerializer).serializeToString( mySVG );
+		loader.src = 'data:image/svg+xml,' + encodeURIComponent( svgAsXML );
+	}
+
+	function allChartsToImg(){
+			{% for chart in Charts %}
+			  chartToImg({{chart.num}});
+			{% endfor %}
+	}
+	*/
 	function drawCharts() {
 		{% for chart in Charts %}
 			var data_{{chart.num}} = new google.visualization.DataTable();
 
 			{% for key,value in chart.Rows[0].values %}
-                {% if chart.roles[key] %}
-                    data_{{chart.num}}.addColumn({{chart.roles[key]|json_encode|raw}});
-                {% else %}
-                    data_{{chart.num}}.addColumn("{{chart.datatypes[key]}}","{{chart.Rows[0].values[key].key}}");
-                {% endif %}
+        {% if chart.roles[key] %}
+          data_{{chart.num}}.addColumn({{chart.roles[key]|json_encode|raw}});
+        {% else %}
+          data_{{chart.num}}.addColumn("{{chart.datatypes[key]}}","{{chart.Rows[0].values[key].key}}");
+        {% endif %}
 			{% endfor %}
 
 			var rows = [
@@ -88,7 +122,6 @@
 			options_{{ chart.num }}.series = n;
 		}
 
-
         {% if chart.type == "Timeline" %}
             var chart_{{chart.num}} = new links.Timeline(document.getElementById('chart_div_{{chart.num}}'));
         {% elseif chart.type == "Bar" or chart.type == "Line" %}
@@ -97,18 +130,31 @@
         {% else %}
           var chart_{{chart.num}} = new google.visualization.{{chart.type}}(document.getElementById('chart_div_{{chart.num}}'));
         {% endif %}
-				{% if chart.options['as_png'] %}
-				  // console.debug('rendering chart {{chart.num}} as png');
+		/*	{# if chart.options['png'] #}
+				  //console.debug('rendering chart {{chart.num}} as png');
 					// Wait for the chart to finish drawing before calling the getImageURI() method.
 					google.visualization.events.addListener(chart_{{chart.num}}, 'ready', function () {
-						chart_div_{{chart.num}}.innerHTML = '<img src="' + chart_{{chart.num}}.getImageURI() + '">';
-						console.log(chart_div_{{chart.num}}.innerHTML);
+					  //console.debug('callback on ready chart {{chart.num}}.');
+						//console.debug(chart_{{chart.num}}.getImageURI);
+						//chart_div_{{chart.num}}.innerHTML = '<img src="' + chart_{{chart.num}}.getImageURI() + '">';
+						console.debug('got innerHTML from getImageURI function');
+						setTimeout(function () {
+						  window.top.status = 'ready_to_print';
+							window.parent.status = 'ready_to_print';
+							window.status = 'ready_to_print';
+							console.debug('delay print ready');
+							console.debug(window);
+					  },2000);
+						console.debug('ready to print');
+						console.debug('window.status=');console.debug(window);
 					});
-				{% endif %}
+				{# endif #}
+		*/
         chart_{{chart.num}}.draw(data_{{chart.num}}, options_{{chart.num}});
 		{% endfor %}
 	}
 
-	google.charts.setOnLoadCallback(drawCharts);
+	//google.charts.setOnLoadCallback(drawCharts);
+	window.setTimeout(drawCharts,2500);
 	</script>
 {% endblock %}

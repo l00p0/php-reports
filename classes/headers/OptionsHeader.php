@@ -72,9 +72,13 @@ class OptionsHeader extends HeaderBase {
 		),
 		'has_charts'=>array(
 			'type'=>'boolean'
+		),
+		'emailable'=>array(
+			'type' => 'boolean',
+			'default' => true
 		)
 	);
-	
+
 	public static function init($params, &$report) {
 		//legacy support for the 'ttl' cache parameter
 		if(isset($params['ttl'])) {
@@ -85,23 +89,23 @@ class OptionsHeader extends HeaderBase {
 		if(isset($params['has_charts']) && $params['has_charts']) {
 			if(!isset($report->options['Charts'])) $report->options['Charts'] = array();
 		}
-		
+
 		// Some parameters were moved to a 'FORMATTING' header
 		// We need to catch those and add the header to the report
 		$formatting_header = array();
-		
+
 		foreach($params as $key=>$value) {
 			// This is a FORMATTING parameter
 			if(in_array($key,array('limit','noborder','vertical','table','showcount','font','nodata','selectable'))) {
 				$formatting_header[$key] = $value;
 				continue;
 			}
-			
+
 			//some of the keys need to be uppercase (for legacy reasons)
 			if(in_array($key,array('database','mongodatabase','cache'))) $key = ucfirst($key);
-			
+
 			$report->options[$key] = $value;
-			
+
 			//if the value is different from the default, it can be exported
 			if(!isset(self::$validation[$key]['default']) || ($value && $value !== self::$validation[$key]['default'])) {
 				//only export some of the options
@@ -110,18 +114,18 @@ class OptionsHeader extends HeaderBase {
 				}
 			}
 		}
-		
+
 		if($formatting_header) {
 			$formatting_header['dataset'] = true;
 			$report->parseHeader('Formatting',$formatting_header);
 		}
 	}
-	
+
 	public static function parseShortcut($value) {
 		$options = explode(',',$value);
-		
+
 		$params = array();
-		
+
 		foreach($options as $v) {
 			if(strpos($v,'=')!==false) {
 				list($k,$v) = explode('=',$v,2);
@@ -131,12 +135,12 @@ class OptionsHeader extends HeaderBase {
 				$k = $v;
 				$v=true;
 			}
-			
+
 			$k = trim($k);
-			
+
 			$params[$k] = $v;
 		}
-		
+
 		return $params;
 	}
 }

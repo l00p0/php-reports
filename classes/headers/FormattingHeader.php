@@ -31,10 +31,6 @@ class FormattingHeader extends HeaderBase {
 		'selectable'=>array(
 			'type'=>'string'
 		),
-		'emailable'=>array(
-			'type'=>'boolean',
-			'default'=>false
-		),
 		'dataset'=>array(
 			'required'=>true,
 			'default'=>true
