@@ -10,9 +10,11 @@
     <link id="bootstrap" href="{{base}}/public/css/bootstrap.{{theme}}.min.css" rel="stylesheet">
     <link href="{{ base }}/public/css/typeahead.js-bootstrap.css" rel="stylesheet">
     <style>
+    {% if Variables['navbar_hide'] is empty  and emailable is empty %}
       body {
         padding-top: 80px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
+    {% endif %}
       .container {
           max-width: 100% !important;
           padding: 0 20px;
