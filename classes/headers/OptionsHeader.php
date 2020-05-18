@@ -73,9 +73,13 @@ class OptionsHeader extends HeaderBase {
 		'has_charts'=>array(
 			'type'=>'boolean'
 		),
+		'nocharts' => array(
+			'type' => 'boolean',
+			'default' => false
+		),
 		'emailable'=>array(
 			'type' => 'boolean',
-			'default' => true
+			'default' => false
 		)
 	);
 
@@ -86,8 +90,13 @@ class OptionsHeader extends HeaderBase {
 			unset($params['ttl']);
 		}
 
-		if(isset($params['has_charts']) && $params['has_charts']) {
-			if(!isset($report->options['Charts'])) $report->options['Charts'] = array();
+		if(isset($params['nocharts']) && $params['nocharts']) {
+			$report->options['nocharts'] = true;
+			$report->options['has_charts'] = false;
+		}else{
+			if(isset($params['has_charts']) && $params['has_charts']) {
+				if(!isset($report->options['Charts'])) $report->options['Charts'] = array();
+			}
 		}
 
 		// Some parameters were moved to a 'FORMATTING' header

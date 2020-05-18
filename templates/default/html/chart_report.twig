@@ -1,6 +1,7 @@
 {% extends "html/chart_page.twig" %}
 
 {% block content %}
+  {% if not nocharts %}
 	{% for chart in Charts %}
 	<!--
 	  <img id='chart_img_{{chart.num}}' style='{% if chart.width %}width:{{chart.width}};{% endif %}{% if chart.height %}height:{{chart.height}};{% endif %}'>
@@ -157,4 +158,5 @@
 	//google.charts.setOnLoadCallback(drawCharts);
 	window.setTimeout(drawCharts,2500);
 	</script>
+	{% endif %}
 {% endblock %}

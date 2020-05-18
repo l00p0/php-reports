@@ -1,5 +1,5 @@
 {% block chart_area %}
-    {% if has_charts and not no_charts %}
+    {% if has_charts and not nocharts %}
 				<iframe src="{{base}}/report/chart/?{{report_querystring}}" id='chart_container' class="auto-height" scrolling="no" style='width:100%;' frameborder="0"></iframe>
         <script>
             $(function() {
@@ -11,7 +11,7 @@
 
 {% include "html/table.twig" %}
 
-{% if not nodata and not Formatting['emailable'] %}
+{% if not nodata and not emailable %}
 <script type='text/javascript'>
 $(function() {
 {% for dataset in DataSets %}
